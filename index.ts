@@ -44,9 +44,9 @@ async function traverseNodes(
         console.log(
             printer.printNode(ts.EmitHint.Unspecified, node, sourceFile)
         ) + '\n';
-    } else if (node.body && ts.isModuleBlock(node.body )) {
+    } else if (node.body && ts.isModuleBlock(node.body)) {
         for (const statement of node.body.statements) {
-        traverseNodes(statement, sourceFile, printer);
+            traverseNodes(statement, sourceFile, printer);
         }
     }
 }
@@ -61,9 +61,9 @@ async function postProcess(
         root: ts.SourceFile
     ): ts.SourceFile => {
         const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });
-for (const statement of root.statements) {
-        traverseNodes(statement, root, printer);
-}
+        for (const statement of root.statements) {
+            traverseNodes(statement, root, printer);
+        }
 
         console.log(
             `PostProcess: config=<${JSON.stringify(pluginContext.option)}>`
