@@ -33,17 +33,23 @@ async function preProcess(
     };
 }
 
- async function traverseNodes(node: ts.Node, sourceFile: ts.SourceFile, printer: ts.Printer) {
+async function traverseNodes(
+    node: ts.Statement,
+    sourceFile: ts.SourceFile,
+    printer: ts.Printer
+) {
     console.log(`Kind ${node.kind}`);
-    
-    if (!ts.isModuleDeclaration(node) && !ts.isNamespaceExportDeclaration(node)) {
-    console.log(printer.printNode(ts.EmitHint.Unspecified, node,sourceFile)) + "\n";
-    }
-    
-    
-    node.forEachChild(child => traverseNodes(child, sourceFile, printer));
 
-} 
+    if (!ts.isModuleDeclaration(node)) {
+        console.log(
+            printer.printNode(ts.EmitHint.Unspecified, node, sourceFile)
+        ) + '\n';
+    } else if (node.body && ts.isModuleBlock(node.body )) {
+        for (const statement of node.body.statements) {
+        traverseNodes(statement, sourceFile, printer);
+        }
+    }
+}
 
 /**
  * This `postProcess` is the hook for the output AST changing.
@@ -55,11 +61,10 @@ async function postProcess(
         root: ts.SourceFile
     ): ts.SourceFile => {
         const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });
-      
-         traverseNodes(root, root, printer);
-        
-        
-      
+for (const statement of root.statements) {
+        traverseNodes(statement, root, printer);
+}
+
         console.log(
             `PostProcess: config=<${JSON.stringify(pluginContext.option)}>`
         );
